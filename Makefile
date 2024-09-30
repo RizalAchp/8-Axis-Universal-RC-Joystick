@@ -122,7 +122,7 @@ $(BUILD_DIR):
 # clean up
 #######################################
 clean:
-	-rm -fR $(BUILD_DIR)
+	-rm -fR $(BUILD_DIR) ./compile_commands.json
 
   # Phony targets
 .PHONY: all build upload clean

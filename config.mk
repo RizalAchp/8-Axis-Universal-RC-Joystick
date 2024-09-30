@@ -3,11 +3,18 @@
 ######################################
 TARGET = urcjoy
 
+ENABLE_PROTO_PPM=1
+ENABLE_PROTO_DSM=0
+ENABLE_PROTO_FPORT=0
+ENABLE_PROTO_IBUS=0
+ENABLE_PROTO_SBUS=0
+ENABLE_LOG_SERIAL=0
+
 ######################################
 # building variables
 ######################################
 # debug build?
-DEBUG = 1
+DEBUG = 0
 # optimization
 ifeq ($(DEBUG), 1)
 OPT = -Og
@@ -27,7 +34,7 @@ TOOLCHAIN_DIR = ${HOME}/STM32Cube/Repository/STM32Cube_FW_F1_V1.8.6
 ######################################
 # C sources
 C_SOURCES =  \
-$(shell find ${PROJECT_DIR}/Core/Src/ -type f -name "*.c" | sort) \
+$(shell find ${PROJECT_DIR}/Core/Src/ -maxdepth 1 -type f -name "*.c" | sort) \
 $(shell find ${PROJECT_DIR}/USB_DEVICE/ -type f -name "*.c" | sort) \
 ${TOOLCHAIN_DIR}/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
 ${TOOLCHAIN_DIR}/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pcd.c \
@@ -50,7 +57,25 @@ ${TOOLCHAIN_DIR}/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
 ${TOOLCHAIN_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
 ${TOOLCHAIN_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
 ${TOOLCHAIN_DIR}/Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-${TOOLCHAIN_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c
+${TOOLCHAIN_DIR}/Middlewares/ST/STM32_USB_Device_Library/Class/CustomHID/Src/usbd_customhid.c \
+${PROJECT_DIR}/Core/Src/protocol/protocol.c
+
+ifeq ($(ENABLE_PROTO_PPM), 1) 
+C_SOURCES += ${PROJECT_DIR}./Core/Src/protocol/protocol_ppm.c
+endif
+ifeq ($(ENABLE_PROTO_DSM), 1) 
+C_SOURCES += ${PROJECT_DIR}./Core/Src/protocol/protocol_dsm.c
+endif
+ifeq ($(ENABLE_PROTO_FPORT), 1) 
+C_SOURCES += ${PROJECT_DIR}./Core/Src/protocol/protocol_fport.c
+endif
+ifeq ($(ENABLE_PROTO_IBUS), 1) 
+C_SOURCES += ${PROJECT_DIR}./Core/Src/protocol/protocol_ibus_ia6.c ${PROJECT_DIR}./Core/Src/protocol/protocol_ibus.c
+endif
+ifeq ($(ENABLE_PROTO_SBUS), 1) 
+C_SOURCES += ${PROJECT_DIR}./Core/Src/protocol/protocol_sbus.c
+endif
+
 
 # ASM sources
 ASM_SOURCES = startup_stm32f103x6.s
@@ -92,7 +117,18 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS = 
 
 # C defines
-C_DEFS = -DUSE_HAL_DRIVER -DSTM32F103x6
+C_DEFS = \
+-DUSE_HAL_DRIVER \
+-DSTM32F103x6 \
+-DPROTO_PPM=$(ENABLE_PROTO_PPM) \
+-DPROTO_DSM=$(ENABLE_PROTO_DSM) \
+-DPROTO_FPORT=$(ENABLE_PROTO_FPORT) \
+-DPROTO_IBUS=$(ENABLE_PROTO_IBUS) \
+-DPROTO_SBUS=$(ENABLE_PROTO_SBUS) \
+
+ifneq ($(ENABLE_LOG_SERIAL), 1)
+C_DEFS += -DNO_LOG_SERIAL
+endif
 
 # AS includes
 AS_INCLUDES = 
