@@ -17,7 +17,7 @@ build: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARG
 upload: $(BUILD_DIR)/$(TARGET).bin
 	# make sure STM32_Programmer_CLI is installed. and available in PATH
 	# download: https://www.st.com/en/development-tools/stm32cubeclt.html
-	STM32_Programmer_CLI -vb -c port=SWD -w $< 0x08000000 -v
+	STM32_Programmer_CLI -vb -c port=SWD -w $< 0x8000000 -v -rst
 
 #######################################
 # info
@@ -125,7 +125,7 @@ clean:
 	-rm -fR $(BUILD_DIR) ./compile_commands.json
 
   # Phony targets
-.PHONY: all build upload clean
+.PHONY: all build clean
 
 #######################################
 # dependencies

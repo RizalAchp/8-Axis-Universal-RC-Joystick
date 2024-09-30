@@ -91,6 +91,8 @@ void PROTO_Run(void) {
     uartInvert = 0;
     PROTO_FportReader();
 #endif /* if PROTO_FPORT */
+
+    BuildAndSendReport();
 }
 
 void BuildAndSendReport(void) {
