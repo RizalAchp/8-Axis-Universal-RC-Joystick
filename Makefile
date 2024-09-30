@@ -17,21 +17,21 @@ build: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARG
 upload: $(BUILD_DIR)/$(TARGET).bin
 	# make sure STM32_Programmer_CLI is installed. and available in PATH
 	# download: https://www.st.com/en/development-tools/stm32cubeclt.html
-	STM32_Programmer_CLI -vb -c port=SWD -w $< 0x8000000 -v -rst
+	STM32_Programmer_CLI -vb 1 -c port=SWD -w $< 0x8000000  -v  -rst
 
 #######################################
 # info
 #######################################
 info:
 	@echo "PROJECT: "
-	@printf "%b" "$(COM_COLOR)TARGET    = $(OBJ_COLOR)$(TARGET)$(NO_COLOR)\n";
-	@printf "%b" "$(COM_COLOR)MCU       = $(OBJ_COLOR)$(MCU)$(NO_COLOR)\n";
-	@printf "%b" "$(COM_COLOR)DEBUG     = $(OBJ_COLOR)$(DEBUG)$(NO_COLOR)\n";
+	@printf "%b" "TARGET    = $(TARGET)\n";
+	@printf "%b" "MCU       = $(MCU)\n";
+	@printf "%b" "DEBUG     = $(DEBUG)\n";
 	@echo "TOOLCHAIN: "
-	@printf "%b" "$(COM_COLOR)  - CC      = $(OBJ_COLOR)$(CC)$(NO_COLOR)\n";
-	@printf "%b" "$(COM_COLOR)  - AS      = $(OBJ_COLOR)$(AS)$(NO_COLOR)\n";
-	@printf "%b" "$(COM_COLOR)  - CP      = $(OBJ_COLOR)$(CP)$(NO_COLOR)\n";
-	@printf "%b" "$(COM_COLOR)  - SZ      = $(OBJ_COLOR)$(SZ)$(NO_COLOR)\n";
+	@printf "%b" "  - CC    = $(CC)\n";
+	@printf "%b" "  - AS    = $(AS)\n";
+	@printf "%b" "  - CP    = $(CP)\n";
+	@printf "%b" "  - SZ    = $(SZ)\n";
 
 #######################################
 # build the application
@@ -46,14 +46,14 @@ OBJECTS += $(addprefix $(BUILD_DIR)/objects/,$(notdir $(ASMM_SOURCES:.S=.o)))
 vpath %.S $(sort $(dir $(ASMM_SOURCES)))
 
 $(BUILD_DIR)/objects/%.o: %.c Makefile | $(BUILD_DIR)/objects 
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)...";
+	@printf "%b" "$(COM_STRING)...";
 	@$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/objects/$(notdir $(<:.c=.lst)) $< -o $@ 2> $@.log; RESULT=$$?; \
 	if [ $$RESULT -ne 0 ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(@F)" "$(ERROR_COLOR)$(ERROR_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(ERROR_STRING)\n"; \
 	elif [ -s $@.log ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(@F)" "$(WARN_COLOR)$(WARN_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(WARN_STRING)\n"; \
 	else  \
-		printf "%-60b%b" "$(OBJ_COLOR) $(@F)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(OK_STRING)\n"; \
 	fi; \
 	cat $@.log; \
 	rm -f $@.log; \
@@ -61,14 +61,14 @@ $(BUILD_DIR)/objects/%.o: %.c Makefile | $(BUILD_DIR)/objects
 
 
 $(BUILD_DIR)/objects/%.o: %.s Makefile | $(BUILD_DIR)/objects
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)...";
+	@printf "%b" "$(COM_STRING)...";
 	@$(AS) -c $(CFLAGS) $< -o $@ 2> $@.log; RESULT=$$?; \
 	if [ $$RESULT -ne 0 ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(ERROR_COLOR)$(ERROR_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(ERROR_STRING)\n"; \
 	elif [ -s $@.log ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(WARN_COLOR)$(WARN_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(WARN_STRING)\n"; \
 	else  \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(OK_STRING)\n"; \
 	fi; \
 	cat $@.log; \
 	rm -f $@.log; \
@@ -76,28 +76,28 @@ $(BUILD_DIR)/objects/%.o: %.s Makefile | $(BUILD_DIR)/objects
 
 
 $(BUILD_DIR)/objects/%.o: %.S Makefile | $(BUILD_DIR)/objects
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)...";
+	@printf "%b" "$(COM_STRING)...";
 	@$(AS) -c $(CFLAGS) $< -o $@ 2> $@.log; RESULT=$$?; \
 	if [ $$RESULT -ne 0 ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(ERROR_COLOR)$(ERROR_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(ERROR_STRING)\n"; \
 	elif [ -s $@.log ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(WARN_COLOR)$(WARN_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(WARN_STRING)\n"; \
 	else  \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(OK_STRING)\n"; \
 	fi; \
 	cat $@.log; \
 	rm -f $@.log; \
 	exit $$RESULT
 
 $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)...";
+	@printf "%b" "Linking...";
 	@$(CC) $(OBJECTS) $(LDFLAGS) -o $@ 2> $@.log; RESULT=$$?; \
 	if [ $$RESULT -ne 0 ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(ERROR_COLOR)$(ERROR_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(ERROR_STRING)\n"; \
 	elif [ -s $@.log ]; then \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(WARN_COLOR)$(WARN_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(WARN_STRING)\n"; \
 	else  \
-		printf "%-60b%b" "$(OBJ_COLOR) $(F)" "$(OK_COLOR)$(OK_STRING)$(NO_COLOR)\n"; \
+		printf "%-60b%b" "$(@F)" "$(OK_STRING)\n"; \
 	fi; \
 	cat $@.log; \
 	rm -f $@.log; \
@@ -105,11 +105,11 @@ $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
 
 
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)$(OBJ_COLOR) $@$(NO_COLOR)\n";
+	@printf "%b" "Generating $(@F)...\n";
 	@$(HEX) $< $@
 
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	@printf "%b" "$(COM_COLOR)$(COM_STRING)$(OBJ_COLOR) $@$(NO_COLOR)\n";
+	@printf "%b" "Generating $(@F)...\n";
 	@$(BIN) $< $@
 
 $(BUILD_DIR)/objects:
@@ -124,8 +124,8 @@ $(BUILD_DIR):
 clean:
 	-rm -fR $(BUILD_DIR) ./compile_commands.json
 
-  # Phony targets
-.PHONY: all build clean
+# Phony targets
+# .PHONY: all build clean
 
 #######################################
 # dependencies
